@@ -25,10 +25,7 @@ const upload = multer({
 app.use("uploads", express.static("uploads"));
 
 // router
-app.post('/upload', upload.single("image"), (req, res) => {
-    console.log(req.file);
-    res.json(req.file);
-});
+app.post('/upload', upload.single("image"), (req, res) => res.json(req.file);
 
 // port
 app.listen(PORT, () => console.log(`Express server listening on PORT ${PORT}`));
