@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const PORT = 5000;
+require('dotenv').config();
 
 // multer
 const { v4: uuid } = require('uuid');
@@ -21,11 +22,32 @@ const upload = multer({
     limits: { fileSize: 1024 * 1024 * 5 }
 });
 
-// middleware
-app.use("uploads", express.static("uploads"));
+// mongoose
+const mongoose = require('mongoose');
+const Image = require('./models/Image');
 
-// router
-app.post('/upload', upload.single("image"), (req, res) => res.json(req.file);
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+        console.log("MongoDB connected.");
 
-// port
-app.listen(PORT, () => console.log(`Express server listening on PORT ${PORT}`));
+        // middleware
+        app.use("uploads", express.static("uploads"));
+
+        // router
+        app.post('/images', upload.single("image"), async (req, res) => {
+            const image = await new Image({
+                key: req.file.filename,
+                originalFileName: req.file.originalname
+            }).save();
+            res.json(image);
+        });
+
+        app.get('/images', async (req, res) => {
+            const images = await Image.find();
+            res.json(images);
+        })
+
+        // listen
+        app.listen(PORT, () => console.log(`Express server listening on PORT ${PORT}`));
+    })
+    .catch(err => console.log(err));
