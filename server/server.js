@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGO_URI)
         console.log("MongoDB connected.");
 
         // middleware
-        app.use("uploads", express.static("uploads"));
+        app.use("/uploads", express.static("uploads"));
 
         // router
         app.post('/images', upload.single("image"), async (req, res) => {
