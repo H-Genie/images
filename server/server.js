@@ -9,7 +9,8 @@ const { MONGO_URI, PORT } = process.env
 // mongoose
 const mongoose = require('mongoose');
 const { imageRouter } = require('./routes/imageRouter');
-const { userRouter } = require('./routes/userRouter')
+const { userRouter } = require('./routes/userRouter');
+const { authenticate } = require('./middleware/authentication');
 
 mongoose.connect(MONGO_URI)
     .then(() => {
@@ -18,6 +19,7 @@ mongoose.connect(MONGO_URI)
         // middleware
         app.use("/uploads", express.static("uploads"));
         app.use(express.json());
+        app.use(authenticate);
 
         // router
         app.use("/images", imageRouter);
