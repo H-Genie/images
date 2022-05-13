@@ -29,7 +29,7 @@ const LoginPage = () => {
             navigate("/");
             toast.success("로그인에 성공하였습니다.");
         } catch (err) {
-            toast.error(err.message);
+            toast.error(err.response.data.message);
         }
     }
 
