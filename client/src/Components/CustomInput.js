@@ -13,7 +13,7 @@ const CustomInput = props => {
             <div>
                 <label>{label}</label>
                 <input
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', marginBottom: 30 }}
                     type={type}
                     value={value}
                     onChange={e => setValue(e.target.value)} />

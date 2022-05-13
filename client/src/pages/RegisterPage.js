@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import CustomInput from '../Components/CustomInput';
@@ -10,7 +11,8 @@ const RegisterPage = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [passwordCheck, setPasswordCheck] = useState("");
-    const [me, setMe] = useContext(AuthContext);
+    const [, setMe] = useContext(AuthContext);
+    let navigate = useNavigate();
 
     const submitHandler = async (e) => {
         try {
@@ -30,6 +32,8 @@ const RegisterPage = () => {
                 sessionId: result.data.sessionId,
                 name: result.data.name
             });
+
+            navigate("/");
             toast.success("회원가입에 성공하였습니다.")
         } catch (err) {
             toast.error(err.message);
