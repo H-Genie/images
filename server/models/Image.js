@@ -16,6 +16,7 @@ const ImageSchema = new mongoose.Schema({
             required: true
         }
     },
+    likes: [{ type: mongoose.Types.ObjectId }],
     public: {
         type: Boolean,
         required: true,
