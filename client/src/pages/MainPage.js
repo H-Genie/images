@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import UploadForm from '../Components/UploadForm';
 import ImageList from '../Components/ImageList';
+import { AuthContext } from '../context/AuthContext';
 
 const MainPage = () => {
+    const [me] = useContext(AuthContext);
+
     return (
         <>
             <h2>사진첩</h2>
-            <UploadForm />
+            {me && <UploadForm />}
             <ImageList />
         </>
     )
