@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
-import { ImageContext } from '../context/ImageContext'
+import { ImageContext } from '../context/ImageContext';
+import { AuthContext } from '../context/AuthContext';
 
 const ImageList = () => {
-    const [images] = useContext(ImageContext)
+    const { images, myImages, isPublic, setIsPublic } = useContext(ImageContext);
+    const [me] = useContext(AuthContext);
 
-    const imgList = images.map(image => (
+    const imgList = (isPublic ? images : myImages).map(image => (
         <img
             key={image.key}
             src={`http://localhost:3000/uploads/${image.key}`}
@@ -15,7 +17,10 @@ const ImageList = () => {
 
     return (
         <div>
-            <h3>Image List</h3>
+            <h3 style={{ display: 'inline-block', marginRight: 10 }}>
+                Image List ({isPublic ? "공개" : "개인"} 사진)
+            </h3>
+            {me && <button onClick={() => setIsPublic(!isPublic)}>{(isPublic ? "개인" : "공개") + "사진 보기"}</button>}
             {imgList}
         </div>
     )

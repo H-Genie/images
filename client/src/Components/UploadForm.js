@@ -6,7 +6,7 @@ import "./UploadForm.css";
 import { ImageContext } from '../context/ImageContext';
 
 const UploadForm = () => {
-    const [images, setImages] = useContext(ImageContext);
+    const { images, setImages, myImages, setMyImages } = useContext(ImageContext);
     const defaultFilenName = "이미지 파일을 업로드 해주세요.";
     const [imgSrc, setImgSrc] = useState(null);
     const [file, setFile] = useState(null);
@@ -27,15 +27,18 @@ const UploadForm = () => {
                     setPercent(Math.round((100 * e.loaded) / e.total));
                 }
             });
-            setImages([...images, res.data]);
+
+            if (isPublic) setImages([...images, res.data]);
+            else setMyImages([...myImages, res.data]);
             toast.success("이미지 업로드 성공");
+
             setTimeout(() => {
                 setPercent(0);
                 setFileName(defaultFilenName);
                 setImgSrc(null);
             }, 3000);
         } catch (err) {
-            toast.error(err.response.data.message);
+            toast.error(err);
             setPercent(0);
             setFileName(defaultFilenName);
             setImgSrc(null);
