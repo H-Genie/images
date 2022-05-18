@@ -7,6 +7,7 @@ import Toolbar from './Components/Toolbar';
 import MainPage from './pages/MainPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import ImagePage from './pages/ImagePage';
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route path='/' element={<MainPage />} />
         <Route path='/auth/register' element={<RegisterPage />} />
         <Route path='/auth/login' element={<LoginPage />} />
+        <Route path='/images/:imageId' element={<ImagePage />} />
       </Routes>
     </div>
   );
