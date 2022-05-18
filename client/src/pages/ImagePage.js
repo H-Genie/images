@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { ImageContext } from '../context/ImageContext';
 import { AuthContext } from '../context/AuthContext';
 
@@ -9,6 +11,7 @@ const ImagePage = () => {
     const { images, myImages, setImages, setMyImages } = useContext(ImageContext);
     const [hasLiked, setHasLiked] = useState(false);
     const [me] = useContext(AuthContext);
+    let navigate = useNavigate();
 
     const image = images.find(image => image._id === imageId) || myImages.find(image => image._id === imageId);
 
@@ -32,6 +35,22 @@ const ImagePage = () => {
         setHasLiked(!hasLiked);
     }
 
+    const deleteHandler = async () => {
+        try {
+            if (!window.confirm("삭제하시겠습니까?")) return;
+
+            const result = await axios.delete(`/images/${imageId}`);
+            toast.success(result.data.message);
+
+            setImages(images.filter(image => image._id !== imageId));
+            setMyImages(myImages.filter(image => image._id !== imageId));
+
+            navigate("/");
+        } catch (err) {
+            toast.error(err.message);
+        }
+    }
+
     return (
         <div>
             <h3>Image Page - {imageId}</h3>
@@ -40,7 +59,22 @@ const ImagePage = () => {
                 src={`http://localhost:5000/uploads/${image.key}`}
                 style={{ width: '100%' }}
             />
+
             <span>좋아요 {image.likes.length}</span>
+
+            {
+                me && image.user._id === me.userId &&
+                (<button
+                    style={{
+                        float: 'right',
+                        marginLeft: 10
+                    }}
+                    onClick={deleteHandler}
+                >
+                    삭제
+                </button>)
+            }
+
             <button
                 style={{ float: 'right' }}
                 onClick={onSubmit}
