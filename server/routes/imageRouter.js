@@ -9,22 +9,27 @@ const Image = require('../models/Image');
 
 const fileUnlink = promisify(fs.unlink);
 
-imageRouter.post('/', upload.single("image"), async (req, res) => {
+imageRouter.post('/', upload.array("image", 5), async (req, res) => {
     try {
         if (!req.user) throw new Error("권한이 없습니다.");
 
-        const image = await new Image({
-            user: {
-                _id: req.user.id,
-                name: req.user.name,
-                username: req.user.username
-            },
-            public: req.body.pulic,
-            key: req.file.filename,
-            originalFileName: req.file.originalname
-        }).save();
+        const images = await Promise.all(
+            req.files.map(async (file) => {
+                const image = await new Image({
+                    user: {
+                        _id: req.user.id,
+                        name: req.user.name,
+                        username: req.user.username
+                    },
+                    public: req.body.pulic,
+                    key: file.filename,
+                    originalFileName: file.originalname
+                }).save();
+                return image;
+            })
+        );
 
-        res.json(image);
+        res.json(images);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -37,7 +42,6 @@ imageRouter.get('/', async (req, res) => {
 
 imageRouter.delete("/:imageId", async (req, res) => {
     try {
-        console.log(req.params)
         if (!req.user) throw new Error("권한이 없습니다.");
         if (!mongoose.isValidObjectId(req.params.imageId))
             throw new Error("이미지 ID가 올바르지 않습니다.");

@@ -9,7 +9,7 @@ const UploadForm = () => {
     const { images, setImages, myImages, setMyImages } = useContext(ImageContext);
     const defaultFilenName = "이미지 파일을 업로드 해주세요.";
     const [imgSrc, setImgSrc] = useState(null);
-    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState(null);
     const [fileName, setFileName] = useState(defaultFilenName);
     const [percent, setPercent] = useState(0);
     const [isPublic, setIsPublic] = useState(true);
@@ -17,7 +17,7 @@ const UploadForm = () => {
     const onSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        formData.append("image", file);
+        for (let file of files) formData.append("image", file);
         formData.append("public", isPublic);
 
         try {
@@ -28,8 +28,8 @@ const UploadForm = () => {
                 }
             });
 
-            if (isPublic) setImages([...images, res.data]);
-            else setMyImages([...myImages, res.data]);
+            if (isPublic) setImages([...images, ...res.data]);
+            else setMyImages([...myImages, ...res.data]);
             toast.success("이미지 업로드 성공");
 
             setTimeout(() => {
@@ -47,8 +47,9 @@ const UploadForm = () => {
     }
 
     const imageSelectHandler = e => {
-        const imageFile = e.target.files[0];
-        setFile(imageFile);
+        const imageFiles = e.target.files;
+        setFiles(imageFiles);
+        const imageFile = imageFiles[0];
         setFileName(imageFile.name);
 
         const fileReader = new FileReader();
@@ -69,6 +70,7 @@ const UploadForm = () => {
                 <input
                     id='iamge'
                     type='file'
+                    multiple
                     accept='image/*'
                     onChange={imageSelectHandler}
                 />
