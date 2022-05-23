@@ -3,6 +3,7 @@ const userRouter = Router();
 const User = require('../models/User');
 const Image = require('../models/Image');
 const { hash, compare } = require('bcryptjs');
+const mongoose = require('mongoose');
 
 userRouter.post("/register", async (req, res) => {
     try {
@@ -82,8 +83,19 @@ userRouter.get("/me", (req, res) => {
 
 userRouter.get("/me/images", async (req, res) => {
     try {
+        const { lastid } = req.query;
+        if (lastid && !mongoose.isValidObjectId(lastid))
+            throw new Error("Invlid lastid");
+
         if (!req.user) throw new Error("권한이 없습니다.");
-        const images = await Image.find({ "user._id": req.user.id, public: false });
+        const images = await Image.find(
+            lastid
+                ? { "user._id": req.user.id, public: false, _id: { $lt: lastid } }
+                : { "user._id": req.user.id, public: false }
+        )
+            .sort({ _id: -1 })
+            .limit(4);
+
         res.json(images);
     } catch (err) {
         res.status(400).json({ message: err.message });
