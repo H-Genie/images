@@ -36,8 +36,24 @@ imageRouter.post('/', upload.array("image", 5), async (req, res) => {
 });
 
 imageRouter.get('/', async (req, res) => {
-    const images = await Image.find({ public: true });
-    res.json(images);
+    try {
+        const { lastid } = req.query;
+        if (lastid && !mongoose.isValidObjectId(lastid)) throw new Error("Invlid lastid");
+
+        const images = await Image.find(
+            lastid ? {
+                public: true,
+                _id: { $lt: lastid }
+            } : {
+                public: true
+            }
+        )
+            .sort({ _id: -1 })
+            .limit(4);
+        res.json(images);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
 imageRouter.delete("/:imageId", async (req, res) => {
