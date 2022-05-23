@@ -6,7 +6,7 @@ import "./UploadForm.css";
 import { ImageContext } from '../context/ImageContext';
 
 const UploadForm = () => {
-    const { setImages } = useContext(ImageContext);
+    const { setImages, setMyImages } = useContext(ImageContext);
 
     const [files, setFiles] = useState(null);
     const [previews, setPreviews] = useState([]);
@@ -27,7 +27,10 @@ const UploadForm = () => {
                 }
             });
 
-            setImages(prevData => [...prevData, ...res.data]);
+            if (isPublic) setImages(prevData => [...res.data, ...prevData]);
+            // setMyImages(prevData => [...res.data, ...prevData]);
+            else setMyImages(prevData => [...res.data, ...prevData]);
+
             toast.success("이미지 업로드 성공");
 
             setTimeout(() => {
@@ -108,25 +111,30 @@ const UploadForm = () => {
                     onChange={imageSelectHandler}
                 />
             </div>
-            <input
-                type='checkbox'
-                id='public-check'
-                value={!isPublic}
-                onChange={() => setIsPublic(!isPublic)}
-            />
-            {isPublic}
-            <label htmlFor='public-check'> 비공개</label>
-            <button
-                type='submit'
-                style={{
-                    width: '100%',
-                    borderRadius: 3,
-                    height: 40,
-                    cursor: 'pointer'
-                }}
-            >
-                제출
-            </button>
+            {
+                previews.length > 0 &&
+                <div>
+                    <input
+                        type='checkbox'
+                        id='public-check'
+                        value={!isPublic}
+                        onChange={() => setIsPublic(!isPublic)}
+                    />
+                    {isPublic}
+                    <label htmlFor='public-check'> 비공개</label>
+                    <button
+                        type='submit'
+                        style={{
+                            width: '100%',
+                            borderRadius: 3,
+                            height: 40,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        제출
+                    </button>
+                </div>
+            }
         </form>
     );
 }
