@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ProgressBar from './ProgressBar';
@@ -12,6 +12,7 @@ const UploadForm = () => {
     const [previews, setPreviews] = useState([]);
     const [percent, setPercent] = useState(0);
     const [isPublic, setIsPublic] = useState(true);
+    const inputRef = useRef();
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -36,6 +37,7 @@ const UploadForm = () => {
             setTimeout(() => {
                 setPercent(0);
                 setPreviews([]);
+                inputRef.current.value = null;
             }, 3000);
         } catch (err) {
             toast.error(err);
@@ -104,6 +106,7 @@ const UploadForm = () => {
             <div className='file-dropper'>
                 {fileName}
                 <input
+                    ref={ref => inputRef.current = ref}
                     id='iamge'
                     type='file'
                     multiple
