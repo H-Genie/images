@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -13,16 +13,16 @@ const ImagePage = () => {
     const [image, setImage] = useState();
     const [error, setError] = useState(false);
     const [me] = useContext(AuthContext);
-    const imageRef = useRef();
     let navigate = useNavigate();
 
     useEffect(() => {
-        imageRef.current = images.find(image => image._id === imageId);
+        const img = images.find(image => image._id === imageId);
+        if (img) setImage(img);
     }, [images, imageId]);
 
     useEffect(() => {
-        if (imageRef.current) setImage(imageRef.current);
-        else axios.get(`/images/${imageId}`)
+        if (image && image._id === imageId) return;
+        axios.get(`/images/${imageId}`)
             .then(({ data }) => {
                 setError(false);
                 setImage(data);
@@ -31,7 +31,7 @@ const ImagePage = () => {
                 setError(true);
                 toast.error(err.response.data.message);
             });
-    }, [imageId]);
+    }, [imageId, image]);
 
     useEffect(() => {
         if (me && image && image.likes.includes(me.userId)) setHasLiked(true);
@@ -42,7 +42,10 @@ const ImagePage = () => {
 
     const updateImage = (images, image) => [
         ...images.filter(image => image._id !== imageId), image
-    ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    ].sort((a, b) => {
+        if (a._id < b._id) return 1;
+        else return -1;
+    });
 
 
     const onSubmit = async () => {
