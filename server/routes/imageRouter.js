@@ -2,6 +2,7 @@ const fs = require('fs');
 const { promisify } = require('util');
 const { Router } = require('express');
 const mongoose = require('mongoose');
+const { s3 } = require('../aws');
 
 const imageRouter = Router();
 const { upload } = require('../middleware/ImageUpload');
@@ -81,7 +82,13 @@ imageRouter.delete("/:imageId", async (req, res) => {
 
         const image = await Image.findOneAndDelete({ _id: req.params.imageId });
         if (!image) return res.json({ message: "존재하지 않는 이미지입니다." });
-        await fileUnlink(`./uploads/${image.key}`);
+        // await fileUnlink(`./uploads/${image.key}`);
+        s3.deleteObject({
+            Bucket: 'h0.genie-images',
+            Key: `raw/${image.key}`
+        }, (error, data) => {
+            if (error) throw error;
+        });
 
         res.json({ message: "이미지가 삭제되었습니다." });
     } catch (err) {
