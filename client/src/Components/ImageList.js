@@ -36,8 +36,8 @@ const ImageList = () => {
     const imgList = images.map((image, index) => (
         <Link to={`/images/${image._id}`} key={index} ref={index + 1 === images.length ? elementRef : undefined}>
             <img
-                src={`http://localhost:3000/uploads/${image.key}`}
-                alt={image.key}
+                src={`https://s3.ap-northeast-2.amazonaws.com/h0.genie-images/raw/${image.key}`}
+                alt=""
             />
         </Link>
     ));
