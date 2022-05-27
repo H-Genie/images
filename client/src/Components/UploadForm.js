@@ -10,7 +10,7 @@ const UploadForm = () => {
 
     const [files, setFiles] = useState(null);
     const [previews, setPreviews] = useState([]);
-    const [percent, setPercent] = useState(0);
+    const [percent, setPercent] = useState([]);
     const [isPublic, setIsPublic] = useState(true);
     const inputRef = useRef();
 
@@ -63,7 +63,15 @@ const UploadForm = () => {
                 formData.append("Content-Type", file.type);
                 formData.append("file", file);
 
-                return axios.post(presigned.url, formData)
+                return axios.post(presigned.url, formData, {
+                    onUploadProgress: e => {
+                        setPercent(prevData => {
+                            const newData = [...prevData]
+                            newData[index] = Math.round((100 * e.loaded) / e.total);
+                            return newData;
+                        });
+                    }
+                })
             }));
 
             const res = await axios.post("/images", {
@@ -79,13 +87,13 @@ const UploadForm = () => {
 
             toast.success("이미지 업로드 성공");
             setTimeout(() => {
-                setPercent(0);
+                setPercent([]);
                 setPreviews([]);
                 inputRef.current.value = null;
             }, 3000);
         } catch (err) {
             toast.error(err);
-            setPercent(0);
+            setPercent([]);
             setPreviews([]);
             console.error(err);
         }
@@ -115,19 +123,21 @@ const UploadForm = () => {
         setPreviews(imagePreviews);
     }
 
-    const previewImages = previews.map(preview => (
-        <img
-            src={preview.imgSrc}
-            alt={preview.imgSrc}
-            key={preview.imgSrc}
-            className={`image-preview ${preview.imgSrc && "image-preview-show"}`}
-            style={{
-                width: 180,
-                height: 180,
-                objectFit: 'cover',
-                margin: 0
-            }}
-        />
+    const previewImages = previews.map((preview, index) => (
+        <div key={index}>
+            <img
+                src={preview.imgSrc}
+                alt=""
+                className={`image-preview ${preview.imgSrc && "image-preview-show"}`}
+                style={{
+                    width: 180,
+                    height: 180,
+                    objectFit: 'cover',
+                    margin: 0
+                }}
+            />
+            <ProgressBar percent={percent[index]} />
+        </div>
     ));
 
     const fileName = previews.length === 0 ?
@@ -146,7 +156,6 @@ const UploadForm = () => {
             >
                 {previewImages}
             </div>
-            <ProgressBar percent={percent} />
             <div className='file-dropper'>
                 {fileName}
                 <input
