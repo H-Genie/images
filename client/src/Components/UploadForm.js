@@ -1,12 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ProgressBar from './ProgressBar';
 import "./UploadForm.css";
-// import { ImageContext } from '../context/ImageContext';
+import { ImageContext } from '../context/ImageContext';
 
 const UploadForm = () => {
-    // const { setImages, setMyImages } = useContext(ImageContext);
+    const { setImages, setMyImages } = useContext(ImageContext);
 
     const [files, setFiles] = useState(null);
     const [previews, setPreviews] = useState([]);
@@ -54,7 +54,7 @@ const UploadForm = () => {
                 contentTypes: [...files].map(file => file.type)
             });
 
-            const result = await Promise.all([...files].map((file, index) => {
+            await Promise.all([...files].map((file, index) => {
                 const { presigned } = presignedData.data[index];
                 const formData = new FormData();
                 for (const key in presigned.fields) {
@@ -65,6 +65,17 @@ const UploadForm = () => {
 
                 return axios.post(presigned.url, formData)
             }));
+
+            const res = await axios.post("/images", {
+                images: [...files].map((file, index) => ({
+                    imageKey: presignedData.data[index].imageKey,
+                    originalname: file.name
+                })),
+                public: isPublic
+            });
+
+            if (isPublic) setImages(prevData => [...res.data, ...prevData]);
+            else setMyImages(prevData => [...res.data, ...prevData]);
 
             toast.success("이미지 업로드 성공");
             setTimeout(() => {
