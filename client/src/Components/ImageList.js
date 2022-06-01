@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ImageContext } from '../context/ImageContext';
 import { AuthContext } from '../context/AuthContext';
+import Image from './Image';
 import './ImageList.css';
 
 const ImageList = () => {
@@ -35,10 +36,7 @@ const ImageList = () => {
 
     const imgList = images.map((image, index) => (
         <Link to={`/images/${image._id}`} key={index} ref={index + 1 === images.length ? elementRef : undefined}>
-            <img
-                src={`https://s3.ap-northeast-2.amazonaws.com/h0.genie-images/raw/${image.key}`}
-                alt=""
-            />
+            <Image imageUrl={`https://s3.ap-northeast-2.amazonaws.com/h0.genie-images/w140/${image.key}`} />
         </Link>
     ));
 
