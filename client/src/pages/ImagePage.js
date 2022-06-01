@@ -79,7 +79,7 @@ const ImagePage = () => {
             <h3>Image Page - {imageId}</h3>
             <img
                 alt={imageId}
-                src={`https://s3.ap-northeast-2.amazonaws.com/h0.genie-images/w600/${image.key}`}
+                src={`https://d3tzguf70ce0ti.cloudfront.net/w600/${image.key}`}
                 style={{ width: '100%' }}
             />
 
